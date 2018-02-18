@@ -1,10 +1,11 @@
 #Python libraries that we need to import for our bot
 import random
+import os
 from flask import Flask, request
 from pymessenger.bot import Bot
 
 app = Flask(__name__)
-ACCESS_TOKEN = 'EAAIfANooh8QBAJeDEnWvbzEF2SOpmtL7dWCWGiZCXFZCdeaDP04FtQv4ZBKltZCKkm4aNPA7rdUUvvFMRB6o7YHFLwCRB92iNLHZBFpFQSX2gXkSBKZCEW1yhgbA5IoZAmwF1Yj2j6adYimhmVZC75EOBRZBf03Lq8PZCvZBRJJmZCuaf9nMjaP6N86P'
+ACCESS_TOKEN = 'ACCESS_TOKEN'
 VERIFY_TOKEN = 'VERIFY_TOKEN'
 bot = Bot(ACCESS_TOKEN)
 
