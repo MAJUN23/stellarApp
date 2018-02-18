@@ -54,6 +54,8 @@ def fake_message(amount, name):
 def parse_fake_message(message):
     print(message)
     tokens = message.split()
+    if (len(tokens) < 3):
+        return
     name = tokens[1]
     amount = tokens[2]
     return (name, amount,)
