@@ -30,6 +30,8 @@ def receive_message():
                 print(message)
                 if message['message'].get('text'):
                     sender_info = parse_fake_message(message['message'].get('text'))
+                    #prints out the input message
+                    print(sender_info)
                     response_sent_text = fake_message(sender_info[0], sender_info[1])
                     send_message(recipient_id, response_sent_text)
                 #if user sends us a GIF, photo,video, or any other non-text item
