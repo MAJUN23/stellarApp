@@ -1,13 +1,11 @@
 #Python libraries that we need to import for our bot
 import random
-import os
-
 from flask import Flask, request
 from pymessenger.bot import Bot
 
 app = Flask(__name__)
-ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
-VERIFY_TOKEN = os.environ['VERIFY_TOKEN']
+ACCESS_TOKEN = 'EAAIfANooh8QBAJeDEnWvbzEF2SOpmtL7dWCWGiZCXFZCdeaDP04FtQv4ZBKltZCKkm4aNPA7rdUUvvFMRB6o7YHFLwCRB92iNLHZBFpFQSX2gXkSBKZCEW1yhgbA5IoZAmwF1Yj2j6adYimhmVZC75EOBRZBf03Lq8PZCvZBRJJmZCuaf9nMjaP6N86P'
+VERIFY_TOKEN = 'VERIFY_TOKEN'
 bot = Bot(ACCESS_TOKEN)
 
 #We will receive messages that Facebook sends our bot at this endpoint 
@@ -30,7 +28,8 @@ def receive_message():
                 recipient_id = message['sender']['id']
                 print(message)
                 if message['message'].get('text'):
-                    response_sent_text = get_message()
+                    sender_info = parse_fake_message(message['message'].get('text'))
+                    response_sent_text = fake_message(sender_info[0], sender_info[1])
                     send_message(recipient_id, response_sent_text)
                 #if user sends us a GIF, photo,video, or any other non-text item
                 if message['message'].get('attachments'):
@@ -46,11 +45,20 @@ def verify_fb_token(token_sent):
         return request.args.get("hub.challenge")
     return 'Invalid verification token'
 
+def fake_message(amount, name):
+    return "Success! You just sent {} XLM to {}".format(amount, name)
+
+def parse_fake_message(message):
+    tokens = message.split()
+    name = tokens[1]
+    amount = tokens[2]
+    return (name, amount,)
+
 
 #chooses a random message to send to the user
 def get_message():
     sample_responses = ["Will we finish?", "Stellar is cool", "XML!", "Account Balance: 0 XLM :)"]
-    # return selected item to the use
+    # return selected item to the user
     return random.choice(sample_responses)
 
 #uses PyMessenger to send response to user
@@ -58,7 +66,6 @@ def send_message(recipient_id, response):
     #sends user the text message provided via input response parameter
     print(type(recipient_id))
     bot.send_text_message(recipient_id, response)
-    print(bot.send_text_message(recipient_id, response))
     return "success"
 
 if __name__ == "__main__":
