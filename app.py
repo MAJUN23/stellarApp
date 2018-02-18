@@ -1,5 +1,6 @@
 #Python libraries that we need to import for our bot
 import random
+import requests
 import os
 from flask import Flask, request
 from pymessenger.bot import Bot
@@ -30,13 +31,17 @@ def receive_message():
                 #Facebook Messenger ID for user so we know where to send response back to
                 recipient_id = message['sender']['id']
                 print(message)
-                if message['message'].get('text'):
-                    sender_info = parse_fake_message(message['message'].get('text'))
-                    #prints out the input message
-                    #print(sender_info)
-                    if sender_info:
-                        response_sent_text = fake_message(sender_info[0], sender_info[1])
-                        send_message(recipient_id, response_sent_text)
+                 message_text = message['message'].get('text')
+                if message_text:
+                    tokens = message_text.split()
+                    if (tokens[0].upper() == "SEND"):
+                        send_payment(tokens)
+                        print("Payment Sent")
+                    else: 
+                        sender_info = parse_fake_message(message['message'].get('text'))
+                        if sender_info:
+                            response_sent_text = fake_message(sender_info[0], sender_info[1])
+                            send_message(recipient_id, response_sent_text)
                 #if user sends us a GIF, photo,video, or any other non-text item
                 if message['message'].get('attachments'):
                     response_sent_nontext = get_message()
@@ -54,14 +59,13 @@ def verify_fb_token(token_sent):
 def fake_message(amount, name):
     return "Success! You just sent {} XLM to {}".format(amount, name)
 
-def parse_fake_message(message):
+def parse_fake_message(tokens):
     print(message)
-    tokens = message.split()
     if (len(tokens) < 3):
-        return
-    name = tokens[1]
+        return  
+    accountId = tokens[1]
     amount = tokens[2]
-    return (name, amount,)
+    return (accountId, amount,)
 
 
 #chooses a random message to send to the user
@@ -71,11 +75,24 @@ def get_message():
     return random.choice(sample_responses)
 
 #uses PyMessenger to send response to user
+
+
 def send_message(recipient_id, response):
     #sends user the text message provided via input response parameter
     print(type(recipient_id))
     bot.send_text_message(recipient_id, response)
     return "success"
+
+def send_payment(tokens):
+    if (len(tokens) < 4):
+        print("Invalid payment request - not enough arguments")
+        return
+    dest_acct_id_ = tokens[1]
+    amount = tokens[2]
+    secret_seed = tokens[3]
+    root_url = "http://d1663146.ngrok.io/send/"
+    req = requests.post(root_url, {"secretSeed": secret_seed, "destAcctId":dest_acct_id, "amount": amount })
+    return req.text
 
 if __name__ == "__main__":
     app.run()
