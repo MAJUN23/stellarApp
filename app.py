@@ -28,7 +28,8 @@ def receive_message():
                 recipient_id = message['sender']['id']
                 print(message)
                 if message['message'].get('text'):
-                    response_sent_text = get_message()
+                    sender_info = parse_fake_message(message['message'].get('text'))
+                    response_sent_text = fake_message(sender_info[0], sender_info[1])
                     send_message(recipient_id, response_sent_text)
                 #if user sends us a GIF, photo,video, or any other non-text item
                 if message['message'].get('attachments'):
@@ -43,6 +44,18 @@ def verify_fb_token(token_sent):
     if token_sent == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return 'Invalid verification token'
+
+def fake_message(amount, name):
+    return "Success! You just sent {} XLM to {}".format(amount, name)
+
+def parse_fake_message(message):
+    tokens = message.split()
+
+    if (len(tokens) < 3):
+        return 
+    name = tokens[1]
+    amount = tokens[2]
+    return (name, amount,)
 
 
 #chooses a random message to send to the user
